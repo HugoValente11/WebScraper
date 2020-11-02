@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 from PIL import Image
 from io import BytesIO
-
+import os
 
 def start_search():
     # Making search and downloading HTTML
@@ -29,13 +29,20 @@ def start_search():
         if item.attrs["src"] and "http" in item.attrs["src"]:
             img_obj = requests.get(item.attrs["src"])
             print("Status_code:", img_obj.status_code)
-        
+            
+            folder_name = query.replace(" ", "_").lower()
+            dir_name = f"./{folder_name}"
+            # Create folder if none exist
+            if not os.path.isdir(dir_name):
+                os.makedirs(dir_name)
+            
             if img_obj.status_code == 200:     
                 print("Getting:", item.attrs["src"])    
-                i += 1
                 img = Image.open(BytesIO(img_obj.content))
                 path = f"./{query}{i}." + img.format.lower()
-                img.save(f"./scraped_images/{path}", img.format)
+                img.save(f"./{dir_name}/{path}", img.format)
+                i += 1
+
             else:
                 print("An error occured")
     start_search()
